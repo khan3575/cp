@@ -1,0 +1,48 @@
+<snippet>
+    <content><![CDATA[
+
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef long long ll;
+typedef pair<int, int> pii;
+typedef vector<int> vi;
+typedef vector<ll> vll;
+
+#define all(x)   (x).begin(), (x).end()
+#define sz(x)    (int)(x).size()
+#define pb       push_back
+#define F        first
+#define S        second
+#define FOR(i,a,b) for (int i = (a); i < (b); i++)
+
+// Debug: prints locally, vanishes on the judge (because -DLOCAL is local only)
+#ifdef LOCAL
+    #define dbg(x) cerr << "[" << #x << " = " << (x) << "]" << endl
+#else
+    #define dbg(x)
+#endif
+
+
+$2
+
+void solve() {
+    $0
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int t = 1;
+    // cin >> t;$1          // uncomment for multi-testcase problems
+    while (t--) solve();
+
+    return 0;
+}
+]]></content>
+    <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+    <tabTrigger>cpt</tabTrigger>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <scope>source.c++</scope>
+</snippet>

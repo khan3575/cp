@@ -1,0 +1,16 @@
+{
+    // Package Control auto-installs everything listed here on a fresh machine.
+    // This is how your plugin set travels with the repo.
+    "installed_packages": [
+        "A File Icon",
+        "BracketHighlighter",
+        "CppFastOlympicCoding",
+        "Package Control",
+        "SublimeLinter",
+        "Terminus",
+    ],
+    "bootstrapped": true,
+    "in_process_packages":
+    [
+    ],
+}

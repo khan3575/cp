@@ -1,0 +1,14 @@
+[
+    { "keys": ["f5"], "command": "build", "args": {"variant": ""} },
+    { "keys": ["f6"], "command": "build", "args": {"variant": "Debug (checked build)"} },
+    { "keys": ["f7"], "command": "build", "args": {"variant": "Run in terminal (interactive)"} },
+    { "keys": ["f8"], "command": "build", "args": {"variant": "Run (timed)"} },
+    { "keys": ["ctrl+f5"], "command": "build", "args": {"variant": "Compile only"} },
+
+    { "keys": ["f9"],  "command": "cp_toggle_input" },
+    { "keys": ["ctrl+alt+n"], "command": "cp_new_problem" },
+    { "keys": ["ctrl+alt+c"], "command": "cp_new_contest" },
+
+    { "keys": ["escape"], "command": "hide_panel", "args": {"cancel": true} },
+    { "keys": ["ctrl+alt+f"], "command": "clang_format" }
+]

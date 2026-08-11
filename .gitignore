@@ -1,0 +1,37 @@
+# ---- compiled binaries ----
+*.exe
+*.out
+*.o
+*.obj
+*.pdb
+*.ilk
+*.class
+*.bin
+*.dSYM/
+a.out
+bin/
+
+# ---- scratch I/O (regenerated every run) ----
+input.txt
+output.txt
+expected.txt
+err.txt
+_in.txt
+_out*.txt
+*.log
+
+# ---- Sublime per-machine state (must NOT be committed) ----
+*.sublime-workspace
+
+# ---- portable Sublime data dir, if you drop it in this repo ----
+Data/
+sublime-text/
+
+# ---- python cache ----
+__pycache__/
+*.pyc
+
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
+desktop.ini

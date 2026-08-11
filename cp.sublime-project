@@ -1,0 +1,16 @@
+{
+    "folders": [
+        {
+            "path": ".",
+            "name": "CP",
+            "folder_exclude_patterns": [".git", "bin", "__pycache__"],
+            "file_exclude_patterns": ["*.exe", "*.bin", "*.out", "*.o", "*.sublime-workspace"]
+        }
+    ],
+    "settings": {
+        "tab_size": 4,
+        "translate_tabs_to_spaces": true,
+        "default_line_ending": "unix",
+        "save_on_focus_lost": true
+    }
+}

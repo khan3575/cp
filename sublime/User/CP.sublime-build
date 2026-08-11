@@ -1,0 +1,50 @@
+{
+    "selector": "source.c++, source.cpp",
+    "working_dir": "$file_path",
+    "file_regex": "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$",
+    "encoding": "utf-8",
+    "syntax": "Packages/Text/Plain text.tmLanguage",
+
+    "windows": {
+        "shell_cmd": "g++ -std=gnu++20 -O2 -pipe -Wall -Wextra -Wshadow -DLOCAL -Wl,--stack=268435456 -o \"$file_base_name.exe\" \"$file\" && \"$file_base_name.exe\" < input.txt"
+    },
+    "linux": {
+        "shell_cmd": "g++ -std=gnu++20 -O2 -pipe -Wall -Wextra -Wshadow -DLOCAL -o \"$file_base_name.bin\" \"$file\" && ./\"$file_base_name.bin\" < input.txt"
+    },
+    "osx": {
+        "shell_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 -pipe -Wall -Wextra -Wshadow -DLOCAL -o \"$file_base_name.bin\" \"$file\" && ./\"$file_base_name.bin\" < input.txt"
+    },
+
+    "variants": [
+        {
+            "name": "Compile only",
+            "windows": { "shell_cmd": "g++ -std=gnu++20 -O2 -Wall -Wextra -Wshadow -DLOCAL -o \"$file_base_name.exe\" \"$file\"" },
+            "linux":   { "shell_cmd": "g++ -std=gnu++20 -O2 -Wall -Wextra -Wshadow -DLOCAL -o \"$file_base_name.bin\" \"$file\"" },
+            "osx":     { "shell_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 -Wall -Wextra -Wshadow -DLOCAL -o \"$file_base_name.bin\" \"$file\"" }
+        },
+        {
+            "name": "Debug (checked build)",
+            "windows": { "shell_cmd": "g++ -std=gnu++20 -O0 -g -Wall -Wextra -Wshadow -Wconversion -DLOCAL -D_GLIBCXX_DEBUG -D_GLIBCXX_ASSERTIONS -fstack-protector-all -Wl,--stack=268435456 -o \"$file_base_name-dbg.exe\" \"$file\" && \"$file_base_name-dbg.exe\" < input.txt" },
+            "linux":   { "shell_cmd": "g++ -std=gnu++20 -O0 -g -Wall -Wextra -Wshadow -Wconversion -DLOCAL -D_GLIBCXX_DEBUG -D_GLIBCXX_ASSERTIONS -fsanitize=address,undefined -fno-sanitize-recover=all -o \"$file_base_name-dbg.bin\" \"$file\" && ./\"$file_base_name-dbg.bin\" < input.txt" },
+            "osx":     { "shell_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O0 -g -Wall -Wextra -Wshadow -Wconversion -DLOCAL -fsanitize=address,undefined -fno-sanitize-recover=all -o \"$file_base_name-dbg.bin\" \"$file\" && ./\"$file_base_name-dbg.bin\" < input.txt" }
+        },
+        {
+            "name": "Run in terminal (interactive)",
+            "windows": { "shell_cmd": "g++ -std=gnu++20 -O2 -DLOCAL -Wl,--stack=268435456 -o \"$file_base_name.exe\" \"$file\" && start \"CP\" cmd /c \"\"$file_base_name.exe\" & echo. & pause\"" },
+            "linux":   { "shell_cmd": "g++ -std=gnu++20 -O2 -DLOCAL -o \"$file_base_name.bin\" \"$file\" && (x-terminal-emulator -e bash -c './\"$file_base_name.bin\"; echo; read -p \"[enter]\"' || gnome-terminal -- bash -c './\"$file_base_name.bin\"; echo; read -p \"[enter]\"' || xterm -e bash -c './\"$file_base_name.bin\"; read')" },
+            "osx":     { "shell_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 -DLOCAL -o \"$file_base_name.bin\" \"$file\" && open -a Terminal ./\"$file_base_name.bin\"" }
+        },
+        {
+            "name": "Run (timed)",
+            "windows": { "shell_cmd": "g++ -std=gnu++20 -O2 -DLOCAL -Wl,--stack=268435456 -o \"$file_base_name.exe\" \"$file\" && powershell -Command \"$t=Measure-Command { Get-Content input.txt | ./$file_base_name.exe | Out-Host }; Write-Host ('--- ' + $t.TotalMilliseconds + ' ms')\"" },
+            "linux":   { "shell_cmd": "g++ -std=gnu++20 -O2 -DLOCAL -o \"$file_base_name.bin\" \"$file\" && /usr/bin/time -f '\\n--- %e s / %M KB' ./\"$file_base_name.bin\" < input.txt" },
+            "osx":     { "shell_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 -DLOCAL -o \"$file_base_name.bin\" \"$file\" && time ./\"$file_base_name.bin\" < input.txt" }
+        },
+        {
+            "name": "Run (output.txt)",
+            "windows": { "shell_cmd": "g++ -std=gnu++20 -O2 -DLOCAL -Wl,--stack=268435456 -o \"$file_base_name.exe\" \"$file\" && \"$file_base_name.exe\" < input.txt > output.txt && type output.txt" },
+            "linux":   { "shell_cmd": "g++ -std=gnu++20 -O2 -DLOCAL -o \"$file_base_name.bin\" \"$file\" && ./\"$file_base_name.bin\" < input.txt > output.txt && cat output.txt" },
+            "osx":     { "shell_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 -DLOCAL -o \"$file_base_name.bin\" \"$file\" && ./\"$file_base_name.bin\" < input.txt > output.txt && cat output.txt" }
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+{
+    // ---------- editor ----------
+    "font_face": "Consolas",
+    "font_size": 13,
+    "line_padding_bottom": 1,
+    "caret_style": "phase",
+    "highlight_line": true,
+    "match_brackets_angle": true,
+    "rulers": [100],
+    "word_wrap": false,
+    "scroll_past_end": 0.5,
+    "draw_white_space": ["selection"],
+    "bold_folder_labels": true,
+
+    // ---------- indentation (must match .clang-format) ----------
+    "tab_size": 4,
+    "translate_tabs_to_spaces": true,
+    "detect_indentation": false,
+    "auto_indent": true,
+    "smart_indent": true,
+    "indent_to_bracket": false,
+
+    // ---------- saving: critical for contests ----------
+    // Build always compiles what you see; no "why is my fix not applied?"
+    "save_on_focus_lost": true,
+    "atomic_save": false,
+    "trim_trailing_white_space_on_save": "all",
+    "ensure_newline_at_eof_on_save": true,
+    "default_line_ending": "unix",
+    "default_encoding": "UTF-8",
+
+    // ---------- speed ----------
+    "index_files": false,
+    "auto_complete_delay": 30,
+    "auto_complete_size_limit": 1048576,
+    "close_windows_when_empty": false,
+    "hot_exit": true,
+    "remember_open_files": true,
+
+    // ---------- noise reduction ----------
+    "show_definitions": false,
+    "mini_diff": true,
+    "show_git_status": true,
+    "update_check": false,
+    "ignored_packages": ["Vintage",
+    ],
+
+    "theme": "auto",
+    "color_scheme": "auto",
+}

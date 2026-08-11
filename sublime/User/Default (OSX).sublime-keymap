@@ -1,0 +1,8 @@
+[
+    { "keys": ["super+r"], "command": "build", "args": {"variant": ""} },
+    { "keys": ["super+shift+r"], "command": "build", "args": {"variant": "Debug (checked build)"} },
+    { "keys": ["super+alt+r"], "command": "build", "args": {"variant": "Run in terminal (interactive)"} },
+    { "keys": ["f9"],  "command": "cp_toggle_input" },
+    { "keys": ["super+alt+n"], "command": "cp_new_problem" },
+    { "keys": ["super+alt+c"], "command": "cp_new_contest" }
+]
