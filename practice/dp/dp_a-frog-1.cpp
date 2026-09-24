@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dp/tasks/dp_a
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,27 +34,35 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-const ll INF = 1e18;
-
-vector<ll>dp;
-ll n,w;
-
-
 
 void solve() {
-    cin >> n >> w;
-
-    vector<ll>weights(n);
-    vector<ll>values(n);
-
-    ll totalValue = 0;
+    int n;
+    cin >> n;
+    vector<int> v(n);
     for(int i = 0; i < n; i++)
     {
-        cin >> weights[i] >> values[i];
-        totalValue += values[i];
+        cin >> v[i];
     }
 
-    dp.resize(totalValue+1,INF);
+    vector<int> cost(n);
+    cost[0] = 0;
+    for(int i = 1; i < n; i++)
+    {
+        int jumpFrom1 = i-1;
+        int jumpFrom2 = i-2;
+        int ans = INT_MAX;
+        if(jumpFrom1>=0)
+        {
+            ans = min(ans, abs(v[i]-v[jumpFrom1]) + cost[jumpFrom1]);
+        }
+        if(jumpFrom2>=0)
+        {
+            ans = min(ans, abs(v[i]-v[jumpFrom2]) + cost[jumpFrom2]);
+        }
+        cost[i] = ans;
+    }
+    cout<< cost[n-1]<<endl;
+
 }
 
 int main() {

@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dp/tasks/dp_b
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,37 +34,31 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-const ll MOD = 1e9 + 7;
-vector<ll> dp;
-
-ll calculate(ll n)
-{
-    ll cnt = 0;
-
-    if(n == 0)
-    {
-        return 1;
-    }
-    if(dp[n]!=-1)
-    {
-        return dp[n];
-    }
-    //dbg(n);
-    for(int i = 1; i <= 6; i++)
-    {
-        if(n-i>=0)
-        {
-            cnt = (cnt + calculate(n-i))%MOD;
-        }
-    }
-    return dp[n] = cnt % MOD;
-}
 
 void solve() {
-    ll n;
-    cin >> n;
-    dp.resize(n+1, -1);
-    cout<< calculate(n);
+    int n, k;
+    cin >> n >> k;
+    // using push transition
+    // idea is like this
+    // im in i'th step and this is final
+    // now from here where can i go next?
+    vector<ll>v(n);
+    for(ll &i: v) cin >> i;
+
+    vector<ll> cost(n,INT_MAX);
+    cost[0] = 0;
+    for(int i = 0; i<n; i++)
+    {
+        for(int j = 1; j <= k && ((i + j)< n); j++)
+        {
+            int goToNext = i + j;
+            if(goToNext < n)
+            {
+                cost[goToNext] = min( abs(v[i]-v[goToNext]) + cost[i] ,cost[goToNext]);
+            }
+        }
+    }
+    cout<< cost[n-1]<<endl;
 }
 
 int main() {

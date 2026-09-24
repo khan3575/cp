@@ -1,3 +1,5 @@
+// https://cses.fi/problemset/task/1633
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,41 +34,37 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-const int N = 1e6 + 5;
-vector<ll> dp(N,-1);
+const ll MOD = 1e9 + 7;
+vector<ll> dp;
 
 ll calculate(ll n)
 {
+    ll cnt = 0;
+
     if(n == 0)
     {
-        return 0;
+        return 1;
     }
-    if(dp[n] != -1)
+    if(dp[n]!=-1)
     {
         return dp[n];
     }
-
-    vector<ll> extractedDigitList;
-    ll temp = n;
-    while(temp)
+    //dbg(n);
+    for(int i = 1; i <= 6; i++)
     {
-        int digit = temp % 10;
-        extractedDigitList.push_back(digit);
-        temp /= 10;
+        if(n-i>=0)
+        {
+            cnt = (cnt + calculate(n-i))%MOD;
+        }
     }
-    sort(extractedDigitList.begin(),extractedDigitList.end());
-    int sz = extractedDigitList.size();
-    return dp[n] =(1LL + calculate(n - extractedDigitList[sz-1]));
+    return dp[n] = cnt % MOD;
 }
-void solve() {
-    int n;
-    cin >> n;
-    for (int i = 1; i <=9; ++i)
-    {
-        dp[i] = 1;
-    }
-    cout<< calculate(n)<<endl;
 
+void solve() {
+    ll n;
+    cin >> n;
+    dp.resize(n+1, -1);
+    cout<< calculate(n);
 }
 
 int main() {

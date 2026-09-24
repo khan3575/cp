@@ -1,3 +1,5 @@
+// https://cses.fi/problemset/task/1637
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,36 +34,40 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-
 const int N = 1e6 + 5;
-const int MOD = 1e9 + 7;
+vector<ll> dp(N,-1);
+
+ll calculate(ll n)
+{
+    if(n == 0)
+    {
+        return 0;
+    }
+    if(dp[n] != -1)
+    {
+        return dp[n];
+    }
+
+    vector<ll> extractedDigitList;
+    ll temp = n;
+    while(temp)
+    {
+        int digit = temp % 10;
+        extractedDigitList.push_back(digit);
+        temp /= 10;
+    }
+    sort(extractedDigitList.begin(),extractedDigitList.end());
+    int sz = extractedDigitList.size();
+    return dp[n] =(1LL + calculate(n - extractedDigitList[sz-1]));
+}
 void solve() {
-    // ai khane total coin 100 and total possible value 1e6
-    // total 2d array size hobe 100 * 1000000 ja 850 mb size.
-    // corrrect solution is bottom up approach
-
-    ll n, target;
-    cin >> n >> target;
-
-    vector<int> v(n);
-    for(int i = 0; i < n; i++)
+    int n;
+    cin >> n;
+    for (int i = 1; i <=9; ++i)
     {
-        cin >> v[i];
+        dp[i] = 1;
     }
-    vector<ll>dp(N, 0);
-    dp[0] = 1;
-
-    // here the thinkings are like this
-    // using coin 1 how many way i can make 1, 2, 3,4 values
-    // using coin 2 how many way i can make value.. like this
-    for(int coin :v)
-    {
-        for(int val = coin ; val<=target; val++)
-        {
-            dp[val] = (dp[val] + dp[val-coin])% MOD;
-        }
-    }
-    cout<< dp[target] <<endl;
+    cout<< calculate(n)<<endl;
 
 }
 

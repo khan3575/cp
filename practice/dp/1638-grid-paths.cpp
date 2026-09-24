@@ -1,3 +1,5 @@
+// https://cses.fi/problemset/task/1638
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,33 +34,59 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-const int N = 1e6+5;
-const int MOD = 1e9 + 7;
+const ll MOD = 1e9 + 7;
+vector<vector<ll>> dp;
+vector<vector<ll>> arr;
+
+ll calculate(int i, int j, int n)
+{
+    if(i >= n || j >= n)
+    {
+        return 0;
+    }
+    if(i == n-1 && j == n-1 && arr[i][j])
+    {
+        return dp[i][j] = 1;
+    }
+    if(dp[i][j] != -1)
+    {
+        return dp[i][j];
+    }
+
+    ll cnt = 0;
+
+    cnt =  (cnt+ arr[i][j] * ((calculate(i+1, j, n) + calculate(i, j+1, n)) %MOD));
+    //dbg(i,j,arr[i][j]);
+    return dp[i][j] = cnt % MOD;
+}
+
 void solve() {
-    int n, target;
-    cin >> n >> target;
-    vector<int> v(n);
+    int n;
+    cin >> n;
+    vector<string> v(n);
+    dp.resize(n, vector<ll>(n,-1));
+    arr.resize(n, vector<ll>(n,0));
+
     for(int i = 0; i < n; i++)
     {
         cin >> v[i];
     }
 
-    // aitar approach holo
-    // ai amount ta kon kon coin dia banaite parbo.
-    vector<ll> dp(N,0);
-    dp[0] = 1;
-    for(int amount = 1; amount <= target; amount++)
+    for(int i = 0; i < n; i++)
     {
-        for(int coin : v)
+        for(int j = 0; j < n; j++)
         {
-            if(amount >= coin)
+            if(v[i][j] == '.')
             {
-                dp[amount] = (dp[amount] + dp[amount-coin])% MOD;
+                arr[i][j] = 1;
+            }
+            else{
+                arr[i][j] = 0;
             }
         }
     }
+    cout << calculate(0,0,n)<<endl;
 
-    cout<< dp[target]<<endl;
 }
 
 int main() {

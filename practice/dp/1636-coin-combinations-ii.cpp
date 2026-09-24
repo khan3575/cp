@@ -1,3 +1,5 @@
+// https://cses.fi/problemset/task/1636
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -33,32 +35,36 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #endif
 // -----------------------------------------------------------------
 
+const int N = 1e6 + 5;
+const int MOD = 1e9 + 7;
 void solve() {
-    int n, k;
-    cin >> n >> k;
+    // ai khane total coin 100 and total possible value 1e6
+    // total 2d array size hobe 100 * 1000000 ja 850 mb size.
+    // corrrect solution is bottom up approach
 
-    vector<ll>v(n);
-    for(ll &i: v) cin >> i;
+    ll n, target;
+    cin >> n >> target;
 
-    vector<ll> cost(n,0);
-
-    for(int i = 1; i<n; i++)
+    vector<int> v(n);
+    for(int i = 0; i < n; i++)
     {
-        ll minimumCost = INT_MAX;
-        for(int j = 1; j<=k; j++)
-        {
-
-            int jumpFrom = i - j;
-            ll jumpCost = 0;
-            if(jumpFrom>=0)
-            {
-                jumpCost = abs(v[i] - v[jumpFrom]) + cost[jumpFrom];
-                minimumCost= min(jumpCost, minimumCost);
-            }
-        }
-        cost[i]= minimumCost;
+        cin >> v[i];
     }
-    cout<< cost[n-1]<<endl;
+    vector<ll>dp(N, 0);
+    dp[0] = 1;
+
+    // here the thinkings are like this
+    // using coin 1 how many way i can make 1, 2, 3,4 values
+    // using coin 2 how many way i can make value.. like this
+    for(int coin :v)
+    {
+        for(int val = coin ; val<=target; val++)
+        {
+            dp[val] = (dp[val] + dp[val-coin])% MOD;
+        }
+    }
+    cout<< dp[target] <<endl;
+
 }
 
 int main() {

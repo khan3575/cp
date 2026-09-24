@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dp/tasks/dp_c
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -33,30 +35,31 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #endif
 // -----------------------------------------------------------------
 
-void solve() {
-    int n, k;
-    cin >> n >> k;
-    // using push transition
-    // idea is like this
-    // im in i'th step and this is final
-    // now from here where can i go next?
-    vector<ll>v(n);
-    for(ll &i: v) cin >> i;
 
-    vector<ll> cost(n,INT_MAX);
-    cost[0] = 0;
-    for(int i = 0; i<n; i++)
+
+void solve() {
+    int n;
+    cin >> n;
+    vector<vector<int>> v(n+1, vector<int>(3,0));
+    vector<vector<int>> dp(n+1, vector<int>(3,0));
+    for(int i = 1; i<=n; i++)
     {
-        for(int j = 1; j <= k && ((i + j)< n); j++)
+        for(int j = 0; j < 3; j++)
         {
-            int goToNext = i + j;
-            if(goToNext < n)
-            {
-                cost[goToNext] = min( abs(v[i]-v[goToNext]) + cost[i] ,cost[goToNext]);
-            }
+            cin>> v[i][j];
         }
     }
-    cout<< cost[n-1]<<endl;
+    dp[0][0] = 0;
+    dp[0][1] = 0;
+    dp[0][2] = 0;
+
+    for(int i = 1; i <= n;  i++)
+    {
+        dp[i][0] = v[i][0] + max(dp[i-1][1],dp[i-1][2]);
+        dp[i][1] = v[i][1] + max(dp[i-1][0],dp[i-1][2]);
+        dp[i][2] = v[i][2] + max(dp[i-1][0],dp[i-1][1]);
+    }
+    cout<< max({dp[n][0],dp[n][1], dp[n][2]})<<endl;
 }
 
 int main() {

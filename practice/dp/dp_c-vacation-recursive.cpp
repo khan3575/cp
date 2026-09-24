@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dp/tasks/dp_c
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,53 +34,43 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-const ll MOD = 1e9 + 7;
-const int N = 1e6+5;
-vector<ll> dp(N, -1);
-vector<ll> v;
+const int N = 2e5+5;
+int n;
+vector<vector<int>> v;
+vector<vector<int>> dp(N,vector<int>(3,-1));
 
-ll n, target;
-// ai value pawar koyta way ache..
-ll calculate(ll value)
+int pickNext(int row, int currentCol)
 {
-    ll sum = 0;
-    if(value == 0)
-    {
-        return 1;
-    }
-    if(value <0)
+    if(row>=n)
     {
         return 0;
     }
-    if(dp[value] != -1)
+    if(dp[row][currentCol]!=-1)
     {
-        return dp[value];
+        return dp[row][currentCol];
     }
 
-    for(int i = 0; i < n; i++)
-    {
-        ll nextValue = value - v[i];
 
-        if(nextValue>=0)
+    int ans = 0;
+    for(int i = 0; i < 3; i++)
+    {
+        if(i == currentCol)
         {
-           sum = (sum + calculate(nextValue) ) % MOD;
+            continue;
         }
+        ans = max(ans, v[row][currentCol] + pickNext(row+1, i) );
     }
-    return dp[value] = sum;
+    return dp[row][currentCol] = ans;
 }
 
 void solve() {
-
- cin >> n >> target;
- v.resize(n);
-
-
- for(int i = 0; i< n; i++)
- {
-    cin >> v[i];
- }
- dp[0] = 1;
- cout<< calculate(target)<<endl;
+    cin >> n;
+    v.resize(n,vector<int>(3,0));
+    for(int i = 0; i < n; i++)
+    {
+        cin>> v[i][0] >> v[i][1] >> v[i][2];
+    }
+    cout<< max({pickNext(0,0), pickNext(0,1), pickNext(0,2)})<<endl;
 }
 
 int main() {

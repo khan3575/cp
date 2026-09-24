@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dp/tasks/dp_d
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,33 +34,49 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
+ll n, totalWeight;
+vector<ll> values;
+vector<ll> weights;
+vector<vector<ll>> dp;
+// return korbe value and condition hocche weight
+// either pick or not pick
 
-void solve() {
-    int n;
-    cin >> n;
-    dbg("n ", n);
-    vector<int> v(n);
-    for(int &i : v) cin >> i;
-    vector<int> cost(n);
-    cost[0]=0;
-
-    for(int i = 1; i <n; i++)
+ll pick(ll idx, ll weight)
+{
+    if(idx>=n)
     {
-        dbg(i);
-        int last = i - 1;
-        int second_last = i - 2;
-        if(last >= 0)
-        {
-
-            cost[i] = cost[last] + abs(v[i]-v[last]);
-        }
-        if(second_last>=0)
-        {
-            cost[i]= min(cost[last] + abs(v[i]-v[last]) , cost[second_last] + abs(v[i]-v[second_last]));
-        }
-        dbg(cost[i]);
+        return 0;
     }
-    cout<< cost[n-1]<<endl;
+
+    if(dp[idx][weight] != -1)
+    {
+        return dp[idx][weight];
+    }
+    ll ans = 0;
+    //pick the current weighted item
+    if(weight + weights[idx] <= totalWeight)
+    {
+        ans = values[idx] + max(ans, pick(idx+1, weight+ weights[idx]));
+    }
+
+    //dont pick the item
+    ans = max(ans, pick(idx+1, weight));
+    return dp[idx][weight] = ans;
+}
+void solve() {
+
+    cin >> n >> totalWeight;
+    values.resize(n);
+    weights.resize(n);
+    dp.resize(n+1,vector<ll>(totalWeight + 1 , -1));
+    for(int i = 0; i < n; i++)
+    {
+        cin >> weights[i] >> values[i];
+    }
+
+    cout<<pick(0,0)<<endl;
+
+
 }
 
 int main() {

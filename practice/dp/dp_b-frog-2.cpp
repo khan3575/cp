@@ -1,3 +1,5 @@
+// https://atcoder.jp/contests/dp/tasks/dp_b
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -32,59 +34,33 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
-const ll MOD = 1e9 + 7;
-vector<vector<ll>> dp;
-vector<vector<ll>> arr;
-
-ll calculate(int i, int j, int n)
-{
-    if(i >= n || j >= n)
-    {
-        return 0;
-    }
-    if(i == n-1 && j == n-1 && arr[i][j])
-    {
-        return dp[i][j] = 1;
-    }
-    if(dp[i][j] != -1)
-    {
-        return dp[i][j];
-    }
-
-    ll cnt = 0;
-
-    cnt =  (cnt+ arr[i][j] * ((calculate(i+1, j, n) + calculate(i, j+1, n)) %MOD));
-    //dbg(i,j,arr[i][j]);
-    return dp[i][j] = cnt % MOD;
-}
 
 void solve() {
-    int n;
-    cin >> n;
-    vector<string> v(n);
-    dp.resize(n, vector<ll>(n,-1));
-    arr.resize(n, vector<ll>(n,0));
-
-    for(int i = 0; i < n; i++)
+    int n, m;
+    cin >> n >> m;
+    vector<int> v(n);
+    for(int i = 0 ; i < n; i++)
     {
         cin >> v[i];
     }
 
-    for(int i = 0; i < n; i++)
+    vector<int> cost(n);
+    cost[0] = 0;
+    for(int i = 1; i < n; i++)
     {
-        for(int j = 0; j < n; j++)
+
+        int minimumCost = INT_MAX;
+        for(int j = 1; j <= m; j++)
         {
-            if(v[i][j] == '.')
+            int jumpFrom = i-j;
+            if(jumpFrom >= 0)
             {
-                arr[i][j] = 1;
-            }
-            else{
-                arr[i][j] = 0;
+                minimumCost = min(minimumCost, abs(v[i]-v[jumpFrom]) + cost[jumpFrom]);
             }
         }
+        cost[i] = minimumCost;
     }
-    cout << calculate(0,0,n)<<endl;
-
+    cout << cost[n-1] << endl;
 }
 
 int main() {
