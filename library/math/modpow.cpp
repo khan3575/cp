@@ -1,5 +1,6 @@
 // Modular exponentiation and inverse (MOD must be prime for inv).
 // O(log e).
+// UNVERIFIED: submit to https://cses.fi/problemset/task/1095 (Exponentiation)
 const long long MOD = 1'000'000'007;
 long long mpow(long long b, long long e, long long m = MOD) {
     long long r = 1;
