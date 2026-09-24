@@ -1,3 +1,5 @@
+// https://codeforces.com/contest/2264/problem/A
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -33,38 +35,49 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #endif
 // -----------------------------------------------------------------
 
-
 void solve() {
-    //input
     int n;
     cin >> n;
-    string s;
-    cin >> s;
-    string ans = s;
+    vector<int>v(n);
+    vector<int> missMatched;
+    vector<int>locationOfMissMatched;
+    for(int i = 0; i< n; i++)
+    {
+        cin >> v[i];
+    }
     for(int i = 0; i < n; i++)
     {
-         int j = i;
-         while(j<n && s[i] == s[j])
-         {
-            j++;
-         }
-         if(j<n)
-         {
-            int k = j;
-            while(k < n && s[k] == s[j])
-            {
-                k++;
-            }
-            string currentSubstring = s.substr(i,k-i);
-            if(currentSubstring < ans)
-            {
-                ans= currentSubstring;
-            }
-         }
-         i = j - 1;
+        int x = i+1;
+        if(v[i] != x)
+        {
+            missMatched.push_back(v[i]);
+            locationOfMissMatched.push_back(i);
+        }
     }
-    cout<<ans<<endl;
+    if(missMatched.size() == 0)
+    {
+        cout<<"YES\n";
+        return;
+    }
 
+    reverse(missMatched.begin(),missMatched.end());
+    int cnt = missMatched.size();
+    for(int i = 0; i< (int)missMatched.size(); i++)
+    {
+        //checking after reversse
+        if(locationOfMissMatched[i] + 1 == missMatched[i])
+        {
+            cnt--;
+        }
+    }
+
+    if(cnt == 0)
+    {
+        cout<<"YES\n";
+    }
+    else{
+        cout<<"NO\n";
+    }
 }
 
 int main() {

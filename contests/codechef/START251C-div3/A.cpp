@@ -1,3 +1,5 @@
+// https://www.codechef.com/START251C/problems/BUSROW
+// idea: TODO
 #include<bits/stdc++.h>
 using namespace std;
 int main()

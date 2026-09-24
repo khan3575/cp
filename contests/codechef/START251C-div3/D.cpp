@@ -1,3 +1,5 @@
+// https://www.codechef.com/START251C/problems/BINSPLT
+// idea: TODO
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -33,7 +35,37 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #endif
 // -----------------------------------------------------------------
 
+
 void solve() {
+    //input
+    int n;
+    cin >> n;
+    string s;
+    cin >> s;
+    string ans = s;
+    for(int i = 0; i < n; i++)
+    {
+         int j = i;
+         while(j<n && s[i] == s[j])
+         {
+            j++;
+         }
+         if(j<n)
+         {
+            int k = j;
+            while(k < n && s[k] == s[j])
+            {
+                k++;
+            }
+            string currentSubstring = s.substr(i,k-i);
+            if(currentSubstring < ans)
+            {
+                ans= currentSubstring;
+            }
+         }
+         i = j - 1;
+    }
+    cout<<ans<<endl;
 
 }
 
@@ -42,7 +74,7 @@ int main() {
     cin.tie(nullptr);
 
     int T = 1;
-    // cin >> T;
+    cin >> T;
     for (int tc = 1; tc <= T; ++tc) {
         // cout << "Case " << tc << ": ";
         solve();

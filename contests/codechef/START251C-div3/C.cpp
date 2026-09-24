@@ -1,3 +1,5 @@
+// https://www.codechef.com/START251C/problems/CHOCGM
+// idea: TODO
 #include<bits/stdc++.h>
 using namespace std;
 int main()
