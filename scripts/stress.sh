@@ -6,8 +6,20 @@ SOL="${1:-A}"; BRUTE="${2:-brute}"; ITER="${3:-1000}"
 GEN="${GEN:-gen.py}"
 FLAGS="-std=gnu++20 -O2 -DLOCAL"
 
-g++ $FLAGS -o "$SOL.bin"   "$SOL.cpp"   || exit 1
-g++ $FLAGS -o "$BRUTE.bin" "$BRUTE.cpp" || exit 1
+# Compiler. An already-set $CXX always wins. Otherwise: on macOS plain g++ is an
+# Apple Clang shim with no <bits/stdc++.h>, so use the same absolute Homebrew GCC
+# that sublime/User/FastOlympicCoding (OSX).sublime-settings uses. Everywhere else
+# plain g++ is real GCC.
+if [ -z "${CXX:-}" ]; then
+    if [ "$(uname -s)" = "Darwin" ]; then
+        CXX="/opt/homebrew/bin/g++-16"
+    else
+        CXX="g++"
+    fi
+fi
+
+"$CXX" $FLAGS -o "$SOL.bin"   "$SOL.cpp"   || exit 1
+"$CXX" $FLAGS -o "$BRUTE.bin" "$BRUTE.cpp" || exit 1
 
 for i in $(seq 1 "$ITER"); do
     python3 "$GEN" "$i" > _in.txt
