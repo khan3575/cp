@@ -35,4 +35,25 @@ __pycache__/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---- FastOlympicCoding ----
+# The plain-name settings file is deliberately NOT used: the per-platform files
+# sublime/User/FastOlympicCoding (Linux|OSX).sublime-settings are tracked instead.
+# This rule stays as a guard so a stray plain file never gets committed.
 sublime/User/FastOlympicCoding.sublime-settings
+# FOC saves test data as "<file>.cpp:tests". A colon is illegal in Windows file
+# names and this repo supports Windows (setup.bat), so these must never enter git.
+*:tests
+
+# ---- Package Control per-machine state ----
+# packagecontrol.io/docs/syncing lists these as files that must not be synced
+# between machines. "Package Control.sublime-settings" IS tracked on purpose:
+# it carries installed_packages, which Package Control uses to reinstall
+# missing packages on the other machine at next start.
+sublime/User/Package Control.last-run
+sublime/User/Package Control.ca-list
+sublime/User/Package Control.ca-bundle
+sublime/User/Package Control.system-ca-bundle
+sublime/User/Package Control.cache/
+sublime/User/Package Control.ca-certs/
+sublime/User/Package Control.user-ca-bundle
