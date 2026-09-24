@@ -1,0 +1,85 @@
+{
+	// macOS-only FOC settings. Sublime merges "FastOlympicCoding (OSX).sublime-settings"
+	// into the name "FastOlympicCoding.sublime-settings", and Packages/User is loaded after
+	// Packages/CppFastOlympicCoding, so this file overrides the package's own (OSX) defaults.
+	// The Linux counterpart lives beside this file. Do NOT add a plain
+	// FastOlympicCoding.sublime-settings: it would apply to both machines at once.
+	// This file replaces the old FastOlympicCoding.sublime-settings.example.
+
+	// ---- paths into this repo (macOS, ~/Desktop/cp) ----
+	"contests_base": "/Users/sakibkhan/Desktop/cp/contests",
+	"algorithms_base": "/Users/sakibkhan/Desktop/cp/library",
+
+	// enable/disable lint
+	"lint_enabled": true,
+	"lint_error_region_scope": "invalid.illegal",
+	"lint_warning_region_scope": "constant",
+
+	// run settings:
+	// "{file}": file name
+	// "{source_file}": full path to file
+	// "{source_file_dir}": path to file directory
+	// "{file_name}": file basename without extension
+	// A settings value replaces the package default for the whole top-level key, so all three
+	// language entries must be present here even though only C++ changes.
+	"run_settings": [
+		{
+			"name": "C++",
+			"extensions": ["cpp"],
+
+			// Absolute path on purpose: plain g++ on macOS is an Apple Clang shim with no
+			// <bits/stdc++.h>, and an app launched from the Dock does not inherit the shell's
+			// PATH, so "g++-16" alone would not resolve.
+			// No -DLOCAL on purpose. FOC merges stderr into the output it checks against the
+			// expected answer, so dbg() output would make a correct answer compare as wrong.
+			// FOC runs behave like the judge; -DLOCAL / dbg() / input.txt live in
+			// CP.sublime-build (Ctrl+B) instead.
+			"compile_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 '{source_file}' -o '{file_name}.bin'",
+			"run_cmd": "./'{file_name}.bin' {args}",
+
+			// -fsyntax-only stops the linter writing a stray a.out: this command runs with no
+			// working directory set, so the binary would land wherever Sublime was started.
+			"lint_compile_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -fsyntax-only '{source_file}' -I '{source_file_dir}'"
+		},
+		{
+			"name": "Python",
+			"extensions": ["py"],
+			"compile_cmd": null,
+			"run_cmd": "python3 '{source_file}'"
+		},
+		{
+			"name": "Java",
+			"extensions": ["java"],
+			"compile_cmd": "javac -J-Dfile.encoding=utf8 -d \"{source_file_dir}\" \"{source_file}\"",
+			"run_cmd": "java -classpath \"{source_file_dir}\" \"{file_name}\""
+		}
+	],
+
+	// time limit for stress
+	"stress_time_limit_seconds": 2,
+
+	// FOC's default: test data sits beside the .cpp as "<file>.cpp:tests".
+	// Gitignored via the *:tests rule, because a colon is illegal on Windows.
+	"tests_relative_dir": "",
+
+	// closing sidebar when executing
+	"close_sidebar": true,
+
+	// enable/disable class complete
+	"cpp_complete_enabled": true,
+	"cpp_complete_settings": {
+		"classes": {
+			"int": { "template_size": 0 },
+			"char": { "template_size": 0 },
+			"bool": { "template_size": 0 },
+			"double": { "template_size": 0 },
+			"string": { "template_size": 0 },
+			"ll": { "template_size": 0 },
+			"pair": { "template_size": 2 },
+			"vector": { "template_size": 1 },
+			"set": { "template_size": 1, "bind": "S" },
+			"map": { "template_size": 2 }
+		},
+		"dont_expand": ["pii", "pll", "ull"]
+	}
+}
