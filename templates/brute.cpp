@@ -1,3 +1,5 @@
+// URL:
+// idea:
 #include <bits/stdc++.h>
 using namespace std;
 // Naive but obviously-correct solution, used by scripts/stress.
