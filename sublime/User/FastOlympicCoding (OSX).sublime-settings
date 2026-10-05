@@ -27,19 +27,20 @@
 			"name": "C++",
 			"extensions": ["cpp"],
 
-			// Absolute path on purpose: plain g++ on macOS is an Apple Clang shim with no
-			// <bits/stdc++.h>, and an app launched from the Dock does not inherit the shell's
-			// PATH, so "g++-16" alone would not resolve.
+			// scripts/cxx.sh (absolute path, like contests_base above) runs the newest Homebrew
+			// g++-N: plain g++ on macOS is an Apple Clang shim with no <bits/stdc++.h>, and no
+			// version is pinned, so `brew upgrade gcc` does not break this.
+			// -Wl,-stack_size gives the 512 MB stack that scripts/run.sh also uses on macOS.
 			// No -DLOCAL on purpose. FOC merges stderr into the output it checks against the
 			// expected answer, so dbg() output would make a correct answer compare as wrong.
 			// FOC runs behave like the judge; -DLOCAL / dbg() / input.txt live in
 			// CP.sublime-build (Ctrl+B) instead.
-			"compile_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -O2 '{source_file}' -o '{file_name}.bin'",
+			"compile_cmd": "'/Users/sakibkhan/Desktop/cp/scripts/cxx.sh' -std=gnu++20 -O2 -Wl,-stack_size,0x20000000 '{source_file}' -o '{file_name}.bin'",
 			"run_cmd": "./'{file_name}.bin' {args}",
 
 			// -fsyntax-only stops the linter writing a stray a.out: this command runs with no
 			// working directory set, so the binary would land wherever Sublime was started.
-			"lint_compile_cmd": "/opt/homebrew/bin/g++-16 -std=gnu++20 -fsyntax-only '{source_file}' -I '{source_file_dir}'"
+			"lint_compile_cmd": "'/Users/sakibkhan/Desktop/cp/scripts/cxx.sh' -std=gnu++20 -fsyntax-only '{source_file}' -I '{source_file_dir}'"
 		},
 		{
 			"name": "Python",

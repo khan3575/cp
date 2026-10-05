@@ -4,14 +4,19 @@
     "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
     "encoding": "utf-8",
     "windows": { "shell_cmd": "python -X utf8 \"$file\" < input.txt" },
-    "linux":   { "shell_cmd": "python3 \"$file\" < input.txt" },
-    "osx":     { "shell_cmd": "python3 \"$file\" < input.txt" },
+    "linux": { "shell_cmd": "\"$packages/User/../../scripts/run.sh\" run \"$file\"" },
+    "osx": { "shell_cmd": "\"$packages/User/../../scripts/run.sh\" run \"$file\"" },
     "variants": [
         {
             "name": "Run in terminal (interactive)",
             "windows": { "shell_cmd": "start \"CP\" cmd /c \"python -X utf8 \\\"$file\\\" & pause\"" },
-            "linux":   { "shell_cmd": "x-terminal-emulator -e bash -c 'python3 \"$file\"; read -p \"[enter]\"'" },
-            "osx":     { "shell_cmd": "open -a Terminal \"$file\"" }
+            "linux": { "shell_cmd": "\"$packages/User/../../scripts/run.sh\" terminal \"$file\"" },
+            "osx": { "shell_cmd": "\"$packages/User/../../scripts/run.sh\" terminal \"$file\"" }
+        },
+        {
+            "name": "Run (timed)",
+            "linux": { "shell_cmd": "\"$packages/User/../../scripts/run.sh\" timed \"$file\"" },
+            "osx": { "shell_cmd": "\"$packages/User/../../scripts/run.sh\" timed \"$file\"" }
         }
     ]
 }

@@ -3,6 +3,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Formatter is off down to the dashed line, so the aliases and debug block stay compact.
+// clang-format off
 using ll  = long long;
 using ull = unsigned long long;
 using pii = pair<int, int>;
@@ -21,7 +23,7 @@ template <class T> void _pr(const T& x) {
         cerr << '('; _pr(x.first); cerr << ", "; _pr(x.second); cerr << ')';
     } else {
         cerr << '{'; bool f = true;
-        for (auto& e : x) { if (!f) cerr << ", "; f = false; _pr(e); }
+        for (const auto& e : x) { if (!f) cerr << ", "; f = false; _pr(e); }
         cerr << '}';
     }
 }
@@ -34,6 +36,7 @@ template <class T, class... A> void _dbg(const T& x, const A&... a) {
 #define dbg(...) ((void)0)
 #endif
 // -----------------------------------------------------------------
+// clang-format on
 
 void solve() {
 

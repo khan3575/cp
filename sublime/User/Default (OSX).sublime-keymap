@@ -1,8 +1,17 @@
 [
+    // Cmd-based keys, plus the same F-keys as Linux so both machines feel identical.
     { "keys": ["super+r"], "command": "build", "args": {"variant": ""} },
     { "keys": ["super+shift+r"], "command": "build", "args": {"variant": "Debug (checked build)"} },
     { "keys": ["super+alt+r"], "command": "build", "args": {"variant": "Run in terminal (interactive)"} },
+
+    { "keys": ["f5"], "command": "build", "args": {"variant": ""} },
+    { "keys": ["f6"], "command": "build", "args": {"variant": "Debug (checked build)"} },
+    { "keys": ["f7"], "command": "build", "args": {"variant": "Run in terminal (interactive)"} },
+    { "keys": ["f8"], "command": "build", "args": {"variant": "Run (timed)"} },
+    { "keys": ["ctrl+f5"], "command": "build", "args": {"variant": "Compile only"} },
+
     { "keys": ["f9"],  "command": "cp_toggle_input" },
     { "keys": ["super+alt+n"], "command": "cp_new_problem" },
-    { "keys": ["super+alt+c"], "command": "cp_new_contest" }
+    { "keys": ["super+alt+c"], "command": "cp_new_contest" },
+    { "keys": ["ctrl+alt+f"], "command": "cp_format" }
 ]

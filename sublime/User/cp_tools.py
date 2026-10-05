@@ -5,11 +5,14 @@ Commands:
     cp_new_problem   Create <Name>.cpp from templates/main.cpp in the current folder.
     cp_new_contest   Create contests/<path>/{A..}.cpp in one shot.
     cp_toggle_input  Open/close input.txt next to the current file, in a side column.
+    cp_format        Format the current file with clang-format, using the repo's .clang-format.
 
 Drop this in Packages/User/ (the setup script symlinks it there).
 """
 
 import os
+import shutil
+import subprocess
 import sublime
 import sublime_plugin
 
@@ -25,8 +28,25 @@ FALLBACK = (
 
 
 def _repo_root(window):
+    # This file is <repo>/sublime/User/cp_tools.py, reached through the Packages/User symlink,
+    # so the repo is found no matter which folder or project the window has open.
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    if os.path.isdir(os.path.join(root, "templates")):
+        return root
     folders = window.folders()
     return folders[0] if folders else None
+
+
+def _find_tool(name):
+    # GUI-launched Sublime may not have Homebrew's bin on PATH.
+    found = shutil.which(name)
+    if found:
+        return found
+    for folder in ("/opt/homebrew/bin", "/usr/local/bin", "/usr/bin"):
+        path = os.path.join(folder, name)
+        if os.path.isfile(path) and os.access(path, os.X_OK):
+            return path
+    return None
 
 
 def _template(window, name="main.cpp"):
@@ -170,3 +190,54 @@ class CpToggleInputCommand(sublime_plugin.WindowCommand):
             })
         self.window.focus_group(1)
         self.window.open_file(path)
+
+
+class CpFormatCommand(sublime_plugin.TextCommand):
+    """Format the whole buffer with clang-format (style from the nearest .clang-format)."""
+
+    def run(self, edit):
+        exe = _find_tool("clang-format")
+        if not exe:
+            sublime.error_message(
+                "cp_tools: clang-format not found.\n\n"
+                "macOS:  brew install clang-format\n"
+                "Linux:  sudo apt install clang-format"
+            )
+            return
+
+        view = self.view
+        name = view.file_name()
+        if not name:
+            name = os.path.join(_repo_root(view.window()) or os.getcwd(), "untitled.cpp")
+        region = sublime.Region(0, view.size())
+        source = view.substr(region)
+        try:
+            proc = subprocess.Popen(
+                [exe, "--style=file", "--assume-filename=" + name],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                cwd=os.path.dirname(name),
+            )
+            out, err = proc.communicate(source.encode("utf-8"))
+        except OSError as exc:
+            sublime.error_message("cp_tools: could not run clang-format: {}".format(exc))
+            return
+        if proc.returncode != 0:
+            sublime.error_message("cp_tools: clang-format failed:\n\n" + err.decode("utf-8", "replace"))
+            return
+
+        formatted = out.decode("utf-8")
+        if formatted == source:
+            sublime.status_message("cp: already formatted")
+            return
+        carets = [(r.a, r.b) for r in view.sel()]
+        viewport = view.viewport_position()
+        view.replace(edit, region, formatted)
+        view.sel().clear()
+        size = view.size()
+        for a, b in carets:
+            view.sel().add(sublime.Region(min(a, size), min(b, size)))
+        view.set_viewport_position(viewport, False)
+        sublime.status_message("cp: formatted")
+
+    def is_enabled(self):
+        return self.view.match_selector(0, "source.c, source.c++")

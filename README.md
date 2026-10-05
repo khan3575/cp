@@ -1,13 +1,15 @@
 # cp
 
-A single git repository holding a Sublime Text 4 setup for competitive programming (C++20, with
-Python and Java build support) plus every template, library snippet, and solved problem. The
-Sublime config lives inside the repo at `sublime/User/` and is symlinked into Sublime's real config
-directory, so cloning the repo and running one setup script reproduces the whole editor on a new
-machine — same keybindings, same build flags, same debug tooling. Built for one person's own
-contest and practice workflow, not as a general-purpose template.
+A single git repository holding a Sublime Text 4 setup for competitive programming (C++20, plus
+Python) together with every template, library snippet, and solved problem. The Sublime config
+lives inside the repo at `sublime/User/` and is symlinked into Sublime's real config directory, so
+cloning the repo and running one setup script reproduces the whole editor on a new machine.
 
-## Quick start
+**Linux and macOS are the supported platforms and behave identically**: same keys, same flags,
+same scripts. Windows files are kept but are not maintained to the same level (see Known
+limitations).
+
+## Quick start (Linux or macOS)
 
 ```bash
 git clone git@github.com:khan3575/cp.git
@@ -15,245 +17,175 @@ cd cp
 ./setup.sh
 ```
 
-This symlinks `sublime/User/` onto Sublime's config directory for your OS
-(`~/Library/Application Support/Sublime Text/Packages/User` on macOS,
-`~/.config/sublime-text/Packages/User` on Linux). Pass a path to make it portable instead, e.g.
-`./setup.sh /path/to/Portable/Data`.
+`setup.sh` is safe to re-run at any time. It:
 
-On Windows, run `setup.bat` (as Administrator, or with Developer Mode on — `mklink` needs one of
-the two) instead of `setup.sh`.
+1. symlinks `sublime/User/` onto Sublime's config directory
+   (`~/Library/Application Support/Sublime Text/Packages/User` on macOS,
+   `~/.config/sublime-text/Packages/User` on Linux; an existing real folder is moved to
+   `User.backup.<timestamp>` first). Pass a path for a portable install: `./setup.sh /path/to/Data`.
+2. checks the toolchain and prints the exact install command for anything missing.
+   `./setup.sh --check` runs only this step.
 
-Then in Sublime: **Project → Open Project…** → `cp.sublime-project`. Always open the project file,
-not a plain folder — `cp_tools.py` (the `Ctrl+Alt+N` / `Ctrl+Alt+C` commands) locates the repo root
-from `window.folders()[0]`, which is only correct when this project is what's open.
+Then in Sublime: **Project → Open Project…** → `cp.sublime-project`. On a brand-new machine also
+run **Tools → Install Package Control** once; it installs the packages listed in
+`sublime/User/Package Control.sublime-settings`.
 
-A C++ compiler is not bundled and must be on `PATH` yourself:
+What you need installed:
 
-| OS | Compiler |
-|---|---|
-| macOS | `brew install gcc`, then point Sublime at the versioned binary (`g++-16`, etc. — plain `g++` on macOS is an Apple Clang shim without `<bits/stdc++.h>`) |
-| Linux | `sudo apt install g++ build-essential` |
-| Windows | MSYS2 → `pacman -S mingw-w64-ucrt-x86_64-gcc`, then add `...\ucrt64\bin` to `PATH` |
+| | macOS | Debian / Ubuntu | Fedora | Arch |
+|---|---|---|---|---|
+| GNU g++ (10 or newer) | `brew install gcc` | `sudo apt install g++` | `sudo dnf install gcc-c++ libasan libubsan` | `sudo pacman -S gcc` |
+| python3 | preinstalled / `brew install python` | `sudo apt install python3` | `sudo dnf install python3` | `sudo pacman -S python` |
+| clang-format (optional) | `brew install clang-format` | `sudo apt install clang-format` | `sudo dnf install clang-tools-extra` | `sudo pacman -S clang` |
 
-Three places pin the macOS compiler to `/opt/homebrew/bin/g++-16` — edit all three if your GCC
-lives elsewhere: the `osx` branches of `sublime/User/CP.sublime-build`, the C++ entry of
-`sublime/User/FastOlympicCoding (OSX).sublime-settings`, and the `Darwin` branch at the top of
-`scripts/stress.sh`. The Linux and Windows paths all use plain `g++`, which is real GCC on both.
-`scripts/stress.bat` is Windows-only and is **not** pinned (see Known limitations).
+No compiler path is hard-coded anywhere. On macOS plain `g++` is Apple Clang (no
+`<bits/stdc++.h>`), so `scripts/cxx.sh` picks the newest Homebrew `g++-N` it can find and keeps
+working after `brew upgrade gcc`. On Linux it uses `g++`. Set `CP_CXX=/path/to/g++` to override.
 
 ## Keybindings
 
-Pulled directly from `sublime/User/Default (*).sublime-keymap`. Windows and Linux are identical;
-macOS is a smaller set.
-
-| Action | Windows / Linux | macOS |
+| Action | Linux | macOS |
 |---|---|---|
-| Build (release run) | `F5` | `Cmd+R` |
-| Debug build (sanitizers) | `F6` | `Cmd+Shift+R` |
-| Run in external terminal (interactive problems) | `F7` | `Cmd+Alt+R` |
-| Run (timed) | `F8` | — *(use Build With…, see below)* |
-| Compile only | `Ctrl+F5` | — *(use Build With…)* |
+| Run (release build, stdin from `input.txt`) | `F5` | `F5` or `Cmd+R` |
+| Debug build (ASan + UBSan + checked STL) | `F6` | `F6` or `Cmd+Shift+R` |
+| Run in a terminal window (interactive problems) | `F7` | `F7` or `Cmd+Alt+R` |
+| Run timed (wall time, CPU time, peak memory) | `F8` | `F8` |
+| Compile only | `Ctrl+F5` | `Ctrl+F5` |
 | Toggle `input.txt` in a side pane | `F9` | `F9` |
-| New problem file (`cp_new_problem`) | `Ctrl+Alt+N` | `Cmd+Alt+N` |
-| New contest scaffold (`cp_new_contest`) | `Ctrl+Alt+C` | `Cmd+Alt+C` |
-| Format with clang-format | `Ctrl+Alt+F` | — *(not bound)* |
-| Cancel build panel | `Escape` | — |
+| New problem file | `Ctrl+Alt+N` | `Cmd+Alt+N` |
+| New contest scaffold | `Ctrl+Alt+C` | `Cmd+Alt+C` |
+| Format with clang-format | `Ctrl+Alt+F` | `Ctrl+Alt+F` |
 
-The macOS keymap only binds three of the five build variants and does not bind clang-format at
-all. To run "Compile only", "Run (timed)", "Run (output.txt)", or clang-format on macOS, use
-**Tools → Build System → Build With…** (`Cmd+Shift+B`) or the Command Palette — this is a real gap
-in the keymap file, not an oversight in this README.
+On a Mac laptop the F-keys need `fn` unless "Use F1, F2, etc. keys as standard function keys" is
+on in System Settings → Keyboard. "Run (output.txt)" has no key: use **Tools → Build With…**.
+
+## How a build works
+
+Every way of building goes through one script, so there is one place to change a flag:
+
+```
+Sublime build system ─┐
+                      ├─> scripts/run.sh <mode> <file> ─┐
+scripts/stress.sh ────┘                                 ├─> scripts/cxx.sh (finds the compiler)
+FastOlympicCoding (macOS) ──────────────────────────────┘
+```
+
+`scripts/run.sh <mode> <file>` also works from a shell. Modes: `run`, `debug`, `timed`, `output`,
+`compile`, `terminal`. It handles `.cpp` and `.py`.
+
+- **Release** flags: `-std=gnu++20 -O2 -pipe -Wall -Wextra -Wshadow -DLOCAL`.
+- **Debug** flags add `-O0 -g -Wconversion -D_GLIBCXX_DEBUG -D_GLIBCXX_ASSERTIONS
+  -fsanitize=address,undefined -fno-sanitize-recover=all`. Use it on any WA or RE before reading
+  your code: an out-of-bounds index or signed overflow that the release build silently gets wrong
+  aborts here with the file and line.
+- **Deep recursion works on both systems.** macOS binaries are linked with a 512 MB main-thread
+  stack; on Linux the script raises `ulimit -s` before running.
+- A crash is never silent: `[cp: killed by SIGSEGV (exit 139)]` or `[cp: exit code 3]` is printed
+  after the program's output.
+- A missing `input.txt` is created empty instead of failing the build.
+- Binaries are `<name>.bin` and `<name>-dbg.bin` beside the source, gitignored.
+- The terminal used by `F7` is Terminal.app on macOS and the first of `x-terminal-emulator`,
+  `gnome-terminal`, `ptyxis`, `kgx`, `konsole`, `xfce4-terminal`, `kitty`, `alacritty`, `foot`,
+  `wezterm`, `xterm` on Linux. Set `CP_TERMINAL` to choose (e.g. `iTerm` or `kitty`).
 
 ## File and folder conventions
-
-Enforced by `cp_tools.py` and the folder layout on disk, not aspirational:
 
 ```
 cp/
 ├── templates/           main.cpp, interactive.cpp, brute.cpp, gen.py
 ├── library/              ds/, graph/, math/, string/ — one algorithm per file
-├── contests/<judge>/<contest-id>-<name>/   judges: codeforces/, codechef/, atcoder/, cses/
+├── scripts/              run.sh, cxx.sh, stress.sh
+├── contests/<judge>/<contest-id>-<name>/   e.g. contests/codeforces/2001-div2/
 │   ├── A.cpp, B.cpp, …   one file per problem, from templates/main.cpp
 │   ├── input.txt         gitignored scratch stdin
-│   └── notes.md          verdict table, generated by Ctrl+Alt+C
+│   └── notes.md          verdict table, generated by the new-contest command
 └── practice/<topic>/<problem-id>-<slug>.cpp   e.g. practice/dp/1974-e-money-buying.cpp
 ```
 
-- **`Ctrl+Alt+N`** (`cp_new_problem`) creates one file from `templates/main.cpp` in the current
-  folder, plus an `input.txt` beside it.
-- **`Ctrl+Alt+C`** (`cp_new_contest`) prompts for a path under `contests/` and a space-separated
-  list of problem letters, then creates one `.cpp` per letter plus `input.txt` and `notes.md`.
-- Contest folder naming: `<judge>/<contest-id>-<short-name>` (`codeforces/2264-div2`) — numeric ID
-  first so alphabetical sort is chronological.
+- **New problem** creates one file from `templates/main.cpp` in the folder of the file you are
+  looking at, plus an `input.txt` beside it.
+- **New contest** prompts for a path under `contests/` and a space-separated list of problem
+  letters, then creates one `.cpp` per letter plus `input.txt` and `notes.md`.
+- Both commands find the repo from the plugin's own location, so they work whichever folder or
+  project the window has open.
+- Contest folder naming: `<judge>/<contest-id>-<short-name>` (`codeforces/2264-div2`).
 - **`<contest-id>` is the id in the judge's own URL, not the round number.** Codeforces Round 1121
   (Div. 2) lives at `codeforces.com/contest/2264`, so the folder is `2264-div2`, not `1121-div2`.
   On CodeChef the id is the contest code in the URL (`codechef.com/START251C` → `START251C-div3`).
 - Every solution file starts with two comment lines: line 1 the problem URL, line 2 a one-sentence
   idea. `templates/*.cpp` ship with blank `// URL:` / `// idea:` lines so new files inherit them.
 - Practice file naming: `<problem-id>-<slug>.cpp`, lowercase, hyphens. Practice folders are topics
-  (`practice/dp/`), never dates.
+  (`practice/dp/`), never dates. CSES and other problem-set practice goes here, not in `contests/`.
 - A snippet only enters `library/` after it has passed on a real judge — see `library/README.md`.
-  Library files are meant to be pasted in with zero edits: no `#include`, no `using namespace`.
 
-**Tracked vs. gitignored**, per the actual `.gitignore`:
+## Stress testing
 
-| Ignored | Tracked |
-|---|---|
-| `*.exe .bin .out .o .obj .pdb .ilk .class`, `*.dSYM/`, `a.out`, `bin/` | Everything else, including `notes.md` |
-| `input.txt`, `output.txt`, `expected.txt`, `err.txt` | `sublime/User/Package Control.sublime-settings` — it carries `installed_packages`, which Package Control uses to reinstall missing packages on the other machine |
-| `_in.txt`, `_out*.txt` (stress-script scratch files) | `sublime/User/FastOlympicCoding (Linux).sublime-settings` and `(OSX)` — see below |
-| `*.sublime-workspace` (per-machine editor state) | |
-| `*:tests` — FastOlympicCoding test data. A `:` is illegal in Windows file names and this repo supports Windows, so these must never be committed | |
-| `sublime/User/Package Control.{last-run,ca-list,ca-bundle,system-ca-bundle,cache/,ca-certs/}` — per-machine state, per packagecontrol.io/docs/syncing | |
-| `.DS_Store`, `Thumbs.db`, `desktop.ini`, `Data/`, `sublime-text/` | |
+Put `brute.cpp` and `gen.py` (copies of the ones in `templates/`) beside the solution, then from
+that folder:
+
+```bash
+../../scripts/stress.sh A brute 1000        # from practice/<topic>/
+../../../scripts/stress.sh A brute 1000     # from contests/<judge>/<contest>/
+```
+
+It stops on the first mismatch **or crash**, prints the input and both outputs, and saves the
+failing input to `input.txt`, ready for `F6`.
 
 ## Debug printing
 
 `dbg(a, b, c)` (from `templates/main.cpp`) prints `[a, b, c] = <va> | <vb> | <vc>` to **stderr** and
-compiles to nothing when `LOCAL` is undefined — no judge defines it, so it's safe to leave in
-submitted code. Handles scalars, pairs, and any iterable container, nested arbitrarily, via
-`if constexpr` dispatch.
+compiles to nothing when `LOCAL` is undefined — no judge defines it, so it is safe to leave in
+submitted code. Handles scalars, strings, pairs, and any container (including `vector<bool>`),
+nested arbitrarily.
 
-There is also a `sublime/User/cpt.sublime-snippet` (`cpt` trigger) on disk with an older,
-single-argument `dbg(x)` macro and `typedef`-style aliases. It predates `templates/main.cpp` and
-nothing in the current workflow (keymap, `cp_tools.py`) references it — treat it as legacy and
-prefer `Ctrl+Alt+N`, not the `cpt` snippet trigger.
+The alias and debug block of the template sits between `// clang-format off` and
+`// clang-format on`, so formatting a solution does not unfold it.
 
 ## FastOlympicCoding: two platform files, and no `-DLOCAL`
 
-FOC reads its settings through `sublime.load_settings("FastOlympicCoding.sublime-settings")`. Its
-own defaults ship only as `FastOlympicCoding (Linux|OSX|Windows).sublime-settings`, because Sublime
-merges a platform-suffixed file into that one name. This repo uses the same mechanism and tracks
-**two** files:
+Sublime merges a platform-suffixed settings file into the plain name, so this repo tracks two
+files and each machine reads only its own:
 
 ```
 sublime/User/FastOlympicCoding (Linux).sublime-settings    -> /usr/bin/g++
-sublime/User/FastOlympicCoding (OSX).sublime-settings      -> /opt/homebrew/bin/g++-16
+sublime/User/FastOlympicCoding (OSX).sublime-settings      -> scripts/cxx.sh (newest Homebrew g++-N)
 ```
 
-There is deliberately **no** plain `FastOlympicCoding.sublime-settings` — it would apply to both
-machines at once, and the compiler path differs. Each machine reads only its own file, so both sync
-through git without conflicting. `Packages/User` loads after the package, so these override FOC's
-defaults. A settings value replaces the whole top-level key, so each file repeats the full
-`run_settings` list (C++, Python, Java) even though only C++ differs.
-
-The macOS file uses an **absolute** compiler path on purpose: plain `g++` on macOS is an Apple Clang
-shim with no `<bits/stdc++.h>`, and an app launched from the Dock does not inherit the shell's
-`PATH`.
+There is deliberately **no** plain `FastOlympicCoding.sublime-settings`: it would apply to both
+machines at once. `setup.sh` deletes one if it finds it, and `.gitignore` keeps it out of git.
+Both files hold absolute paths into the repo (`~/Desktop/cp` on each machine), so edit them if the
+repo moves.
 
 **FOC compiles without `-DLOCAL`, on purpose.** FOC runs the program with stderr merged into stdout
-(`stderr=subprocess.STDOUT`) and compares that combined text against the expected answer. A `dbg()`
-line would therefore turn a correct answer into a wrong one. FOC runs behave like the judge;
-`-DLOCAL`, `dbg()` and `input.txt` live in `CP.sublime-build` (`F5` / `Ctrl+B`) instead.
+and compares that combined text against the expected answer, so a `dbg()` line would turn a correct
+answer into a wrong one. FOC runs behave like the judge; `-DLOCAL`, `dbg()` and `input.txt` belong
+to the Sublime build (`F5`). The lint command uses `-fsyntax-only` because FOC runs it with no
+working directory set and would otherwise drop a stray `a.out`.
 
-The lint command uses `-fsyntax-only` because FOC runs it with no working directory set — without
-it, the linter drops a stray `a.out` wherever Sublime happened to start.
-
-Test data uses FOC's default location: beside the source file, named `<file>.cpp:tests`. The
-`:tests` suffix is applied to the basename whatever `tests_relative_dir` is set to, so the single
-`*:tests` rule in `.gitignore` catches it. That rule exists because a `:` is illegal in a Windows
-file name and this repo supports Windows.
-
-To check which command is live, open **View → Show Console** and run:
-
-```python
-import sublime; print(sublime.load_settings('FastOlympicCoding.sublime-settings').get('run_settings')[0]['compile_cmd'])
-```
-
-## Linux (this machine)
-
-- Ubuntu 26.04, `g++` 15.2.0 at `/usr/bin/g++` — real GCC, so plain `g++` is correct here and
-  `<bits/stdc++.h>` works. None of the macOS compiler workarounds apply.
-- Sublime Text 4 installed as a **snap** (`sublime-text`, classic confinement). Classic confinement
-  means it reads the real home directory, so the config path is the normal one:
-  `~/.config/sublime-text/Packages/User`, symlinked to `cp/sublime/User` by `./setup.sh`.
-- `/usr/bin/time`, `x-terminal-emulator`, `clang-format`, `python3` and `javac` are present.
-  `gnome-terminal` and `xterm` are not, but they are only fallbacks after `x-terminal-emulator`
-  in the "Run in terminal" build variant.
+Test data is saved beside the source as `<file>.cpp:tests`, which `.gitignore` excludes.
 
 ## Known limitations
 
-- **FIXED (was macOS-only): `scripts/stress.sh` called plain `g++`.** It now picks the compiler at
-  the top: an already-set `$CXX` wins, otherwise `uname -s` = `Darwin` selects
-  `/opt/homebrew/bin/g++-16` and everything else selects `g++`. **`scripts/stress.bat` still calls
-  plain `g++`** — that is Windows-only and MinGW's `g++` is real GCC, so it is not the same bug.
-- **macOS-only: the keymap covers fewer build variants than Windows/Linux** (see the keybinding
-  table above).
-- **The Linux "Run in terminal" fallback chain** (`x-terminal-emulator` → `gnome-terminal` →
-  `xterm`): on this Ubuntu machine only `x-terminal-emulator` exists, which is the first entry, so
-  the chain resolves. On a minimal WM or Wayland-only setup it may still find nothing.
-- **Windows build variants are unverified from this machine** — the `Run (timed)` PowerShell
-  `Measure-Command` call and the nested-quote `start "CP" cmd /c "..."` construct for
-  "Run in terminal" were read, not executed, since there's no Windows box here.
-- **Package Control's auto-install list** (`sublime/User/Package Control.sublime-settings`)
-  includes `CppFastOlympicCoding`, `Terminus`, `BracketHighlighter`, `SublimeLinter`, `A File Icon`.
-  Whether all five actually installed on any given machine is per-install state Package Control
-  manages, not something this repo can guarantee — check with
-  `Ctrl+Shift+P` → *Package Control: List Packages* after first launch.
-- **The Competitive Companion browser extension** (for pulling samples straight into
-  FastOlympicCoding) is not part of this repo and must be installed separately in your browser.
-- **`sublime/User/cpt.sublime-snippet` is stale** — see above. It isn't wired into any keybinding
-  or command, and its debug macro is a weaker, single-arg predecessor of the one in
-  `templates/main.cpp`.
-- Sublime Text 4 is assumed throughout (`cp_tools.py` targets the ST4 plugin API). Not tested
-  against ST3.
+- **Windows is not maintained.** `setup.bat`, `scripts/stress.bat` and the `windows` entries of
+  the build files are the original inline `g++` commands. They were never run and do not go
+  through `run.sh`.
+- **Files created from the template before this change** still carry the old `dbg` helper, which
+  fails to compile on `dbg(some_vector_of_bool)`. New files are fine.
+- **Sanitizer output on current macOS** includes a harmless
+  `WARN: Invalid dyld module map detected` line from GCC's runtime. The error report above it is
+  correct.
+- **Flatpak Sublime on Linux** is linked by `setup.sh`, but its sandbox may not see the host
+  compiler. Use the `.deb`/`.rpm`/tarball build.
+- **The Competitive Companion browser extension** is not part of this repo.
+- `sublime/User/cpt.sublime-snippet` (`cpt` trigger) is a legacy template with a weaker
+  single-argument `dbg`. Prefer the new-problem command.
+- Sublime Text 4 is assumed. `cp_tools.py` is written to run on both of its plugin hosts.
 
 ## Tuning
 
-- Compiler flags live only in `sublime/User/CP.sublime-build` (`-std=gnu++20` everywhere — the
-  template uses `if constexpr (requires {...})`, a C++20 feature, so this isn't a drop-in
-  downgrade to `gnu++17`).
-- Linux debug build uses real ASan/UBSan (`-fsanitize=address,undefined`). Windows/MinGW has no
-  ASan, so it substitutes `-D_GLIBCXX_DEBUG -D_GLIBCXX_ASSERTIONS -fstack-protector-all` — weaker,
-  catches STL misuse but not raw heap errors. macOS uses ASan/UBSan like Linux.
-- Windows links `-Wl,--stack=268435456` (256 MB) for deep recursion; there's no equivalent flag
-  wired in for Linux/macOS — raise it yourself with `ulimit -s unlimited` if a DFS segfaults.
-- `sublime/User/Preferences.sublime-settings`: `save_on_focus_lost: true` means a build always
-  compiles what's on screen. `tab_size: 4` / `translate_tabs_to_spaces: true` match
-  `.clang-format`'s `IndentWidth: 4`. Font is `Consolas` — install it or change `font_face` if
-  you're not on Windows.
-
----
-
-### What was actually verified vs. taken on faith
-
-**This section records the original macOS verification run and is kept for history. Some of it is
-now out of date** — in particular `git log` has commits since, and `scripts/stress.sh` no longer
-calls bare `g++`. For what was verified on Ubuntu, see the *Linux (this machine)* section above.
-
-Everything below was executed on the original machine (macOS, GCC 16.1.0 via Homebrew at
-`/opt/homebrew/bin/g++-16`, Python 3.14.6, zsh) while writing this README:
-
-- Compiled `templates/main.cpp` with the exact release build command from `CP.sublime-build` (osx
-  branch) and confirmed `dbg(n, v, m)` prints correctly to stderr, nested containers included.
-- Recompiled without `-DLOCAL` and confirmed `dbg` compiles away with no output.
-- Reproduced the release-vs-debug divergence: an out-of-bounds `vector::operator[]` printed a
-  silent wrong answer under the release flags, and aborted with a diagnostic (exit 134) under the
-  debug flags.
-- Ran `scripts/stress.sh` verbatim against a deliberately buggy solution — it failed immediately
-  because it invokes bare `g++` (Apple Clang on this machine, no `<bits/stdc++.h>`). Re-ran with
-  `g++-16` substituted in and confirmed the mismatch-detection and `input.txt`-repro logic work.
-- Ran `git check-ignore -v` against real generated artifacts (`.bin`, a `.dSYM/` debug bundle,
-  `input.txt`, `_in.txt`, `_out1.txt`, `_out2.txt`) and confirmed every one is caught by
-  `.gitignore`.
-- Compiled all four `library/*/*.cpp` files as they'd actually be pasted (prefixed with
-  `#include <bits/stdc++.h>` / `using namespace std;`) — all four compile clean.
-- Byte-compiled `cp_tools.py` and parsed every `.sublime-project` / `.sublime-build` /
-  `.sublime-keymap` file as JSON (and the two comment-and-trailing-comma settings files with
-  comments/trailing commas stripped first) — all valid.
-- Confirmed `git log` shows no commits and `git status` shows nothing tracked yet, so there's no
-  question of stray binaries already sitting in history.
-- Diffed every file above against the handoff document's canonical contents by reading both.
-
-**Taken on faith / not run here:**
-- Anything Windows-specific (PowerShell `Measure-Command`, the nested-quote terminal launch,
-  `mklink` in `setup.bat`, MinGW stack-size linking) — no Windows machine available.
-- The Linux terminal-emulator fallback chain and `/usr/bin/time` — no Linux machine available.
-- Whether `setup.sh` correctly detects and backs up a pre-existing non-symlink config dir — read,
-  not executed, to avoid touching this machine's real Sublime config as a side effect of writing
-  a README.
-- Whether the packages listed in `Package Control.sublime-settings` actually install cleanly, and
-  whether `FastOlympicCoding`'s `tests/` output format matches what `.gitignore` expects — neither
-  Sublime nor the package registry was exercised here.
-- `cp_tools.py`'s Sublime-side behavior (`show_input_panel`, `set_layout` for the split view) —
-  confirmed it byte-compiles and read the logic, but it needs a live Sublime window to run.
+- Compiler flags: `scripts/run.sh` only.
+- FastOlympicCoding: the two `FastOlympicCoding (Linux|OSX).sublime-settings` files.
+- Formatting style: `.clang-format` (4 spaces, 100 columns), matching `tab_size` in
+  `sublime/User/Preferences.sublime-settings`.
+- Font: no `font_face` is set, so each OS uses its own default monospace font. Set one in
+  `Preferences.sublime-settings` only if it is installed on every machine you use.

@@ -3,7 +3,7 @@
         {
             "path": ".",
             "name": "CP",
-            "folder_exclude_patterns": [".git", "bin", "__pycache__"],
+            "folder_exclude_patterns": [".git", "bin", "__pycache__", "*.dSYM"],
             "file_exclude_patterns": ["*.exe", "*.bin", "*.out", "*.o", "*.sublime-workspace"]
         }
     ],

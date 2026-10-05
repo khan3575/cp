@@ -1,6 +1,7 @@
 {
     // ---------- editor ----------
-    "font_face": "Consolas",
+    // No font_face: Consolas exists on neither macOS nor Linux, so each OS uses its own
+    // default monospace font (Menlo / the system Monospace). Set one here if you install it on both.
     "font_size": 13,
     "line_padding_bottom": 1,
     "caret_style": "phase",
@@ -47,4 +48,5 @@
 
     "theme": "auto",
     "color_scheme": "auto",
+    "file_icon_theme": "A File Icon (Mono).sublime-file-icons",
 }

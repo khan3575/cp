@@ -8,15 +8,25 @@ problem. Cloning it and running one script reproduces the whole editor on either
 | | Linux (primary) | macOS |
 |---|---|---|
 | OS | Ubuntu 26.04 | — |
-| Compiler | `/usr/bin/g++` (GCC 15.2.0, real GCC) | `/opt/homebrew/bin/g++-16` (Homebrew GCC) |
-| Why the absolute path | not needed, plain `g++` is correct | plain `g++` is an Apple Clang shim with no `<bits/stdc++.h>`, and a Dock-launched app does not inherit shell `PATH` |
+| Compiler | `/usr/bin/g++` (GCC 15.2.0, real GCC) | newest Homebrew `g++-N` in `/opt/homebrew/bin` (GCC 16.2.0 on 2026-10-05) |
+| Why not plain `g++` | it is correct, plain `g++` is real GCC | plain `g++` is an Apple Clang shim with no `<bits/stdc++.h>`, and a Dock-launched app does not inherit shell `PATH` |
 | Sublime install | snap `sublime-text` (classic confinement) | normal app |
 | `Packages/User` | `~/.config/sublime-text/Packages/User` | `~/Library/Application Support/Sublime Text/Packages/User` |
 | Symlinked to | `cp/sublime/User` via `./setup.sh` | same |
 
-The macOS compiler path is pinned in **three** places. Change all three together:
-`sublime/User/CP.sublime-build` (`osx` branches), `sublime/User/FastOlympicCoding (OSX).sublime-settings`,
-and the `Darwin` branch at the top of `scripts/stress.sh`.
+**No compiler path is pinned anywhere.** `scripts/cxx.sh` finds the compiler at run time (newest
+Homebrew `g++-N` on macOS, `g++` on Linux; `CP_CXX` or `CXX` overrides it). Everything calls it:
+
+```
+sublime/User/CP.sublime-build (linux + osx) ─┐
+                                             ├─> scripts/run.sh <mode> <file> ─┐
+scripts/stress.sh ───────────────────────────┘                                 ├─> scripts/cxx.sh
+sublime/User/FastOlympicCoding (OSX).sublime-settings ─────────────────────────┘
+```
+
+`scripts/run.sh` is the only place that holds compiler flags for Linux and macOS. The build file
+reaches it as `$packages/User/../../scripts/run.sh`, which works because `Packages/User` is a
+symlink to `cp/sublime/User`. The Linux FOC file still calls `/usr/bin/g++` directly.
 
 ## Layout
 
@@ -28,7 +38,7 @@ cp/
 │                     A.cpp B.cpp … + input.txt + notes.md
 │                     judges: codeforces/ codechef/ atcoder/ cses/
 ├── practice/<topic>/<problem-id>-<slug>.cpp
-├── scripts/          stress.sh, stress.bat
+├── scripts/          run.sh (build + run, all flags), cxx.sh (finds g++), stress.sh, stress.bat
 └── sublime/User/     the tracked Sublime config, symlinked into place
 ```
 
@@ -45,8 +55,10 @@ cp/
 - One file per problem. Never a shared `a.cpp` scratch file.
 - Nothing enters `library/` until it has passed on a real judge, with the verification link in the
   header. Library files paste in with zero edits: no `#include`, no `using namespace`.
-- Build flags are `-std=gnu++20 -O2 -DLOCAL`. Unix binaries are named `.bin` so `.gitignore` catches
-  them; Windows uses `.exe`.
+- Build flags are `-std=gnu++20 -O2 -DLOCAL` plus warnings, set in `scripts/run.sh`. Unix binaries
+  are named `.bin` so `.gitignore` catches them; Windows uses `.exe`.
+- Deep recursion: macOS binaries link with a 512 MB stack (`-Wl,-stack_size,0x20000000`); on Linux
+  `run.sh` raises `ulimit -s` before running.
 - `dbg(...)` prints to **stderr** and compiles to nothing without `-DLOCAL`, so it is safe to leave
   in submitted code.
 
@@ -133,6 +145,16 @@ Fixed:
 - [x] Templates had no `// URL:` / `// idea:` header lines, so new files inherited none.
 - [x] `library/math/modpow.cpp` had no verification reference.
 
+- [x] macOS compiler path was pinned to `g++-16` in three files. Replaced by `scripts/cxx.sh`.
+- [x] Flags were duplicated per platform in `CP.sublime-build`. Linux and macOS now share
+      `scripts/run.sh`; verified on macOS and in an Ubuntu 24.04 container (2026-10-05).
+- [x] `dbg()` did not compile for `vector<bool>`. Fixed in `templates/main.cpp`; files created
+      before 2026-10-05 still carry the old helper.
+- [x] macOS: deep recursion segfaulted (8 MB stack). See the stack rule above.
+- [x] `Ctrl+Alt+F` called a `clang_format` command that no installed package provides. Now
+      `cp_format` in `cp_tools.py`; it needs the `clang-format` binary, which is not installed on
+      the Mac (the owner formats by hand).
+
 Open:
 
 - [ ] `library/math/modpow.cpp` is unverified — submit to CSES 1095 and replace the `UNVERIFIED`
@@ -149,7 +171,5 @@ Open:
 When switching to the Mac:
 
 - [ ] `git pull`
-- [ ] `ls -l /opt/homebrew/bin/g++-16` — confirm the pinned path still exists
-- [ ] run `./setup.sh` if `~/Library/Application Support/Sublime Text/Packages/User` is not a
-      symlink to `cp/sublime/User`
+- [ ] `./setup.sh` — safe to re-run; it re-links if needed and checks the toolchain
 - [ ] re-run the structure audit

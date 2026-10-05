@@ -10,5 +10,5 @@
     { "keys": ["ctrl+alt+c"], "command": "cp_new_contest" },
 
     { "keys": ["escape"], "command": "hide_panel", "args": {"cancel": true} },
-    { "keys": ["ctrl+alt+f"], "command": "clang_format" }
+    { "keys": ["ctrl+alt+f"], "command": "cp_format" }
 ]
