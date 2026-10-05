@@ -102,8 +102,11 @@ cp/
 └── practice/<topic>/<problem-id>-<slug>.cpp   e.g. practice/dp/1974-e-money-buying.cpp
 ```
 
-- **New problem** creates one file from `templates/main.cpp` in the folder of the file you are
-  looking at, plus an `input.txt` beside it.
+- **New problem** asks for a path inside the repo and creates that file from
+  `templates/main.cpp`, plus an `input.txt` beside it. The prompt starts in the folder of the tab
+  you are on when that is inside `practice/` or `contests/`, and at `practice/` otherwise, so the
+  destination is always visible before you press Enter. Typing a folder that does not exist yet
+  (`practice/graph/1666-building-roads`) creates it.
 - **New contest** prompts for a path under `contests/` and a space-separated list of problem
   letters, then creates one `.cpp` per letter plus `input.txt` and `notes.md`.
 - Both commands find the repo from the plugin's own location, so they work whichever folder or

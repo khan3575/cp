@@ -82,33 +82,52 @@ def _current_dir(window):
 
 
 class CpNewProblemCommand(sublime_plugin.WindowCommand):
-    """Create a single problem file in the folder of the active file."""
+    """Create a single problem file. The prompt shows the folder, so it can be changed."""
 
     def run(self):
+        # Start from the active file's folder when that is inside practice/ or contests/;
+        # from anywhere else (library/, templates/, no file open) start at practice/.
+        root = _repo_root(self.window)
+        folder = _current_dir(self.window)
+        initial = ""
+        if root:
+            initial = "practice/"
+            if folder:
+                rel = os.path.relpath(os.path.realpath(folder), os.path.realpath(root))
+                parts = rel.split(os.sep)
+                if parts[0] in ("practice", "contests"):
+                    initial = "/".join(parts) + "/"
         self.window.show_input_panel(
-            "Problem name (e.g. A, C2, 1512b):", "", self.on_done, None, None
+            "New problem, path inside cp/ (e.g. practice/dp/1633-dice-combinations):",
+            initial, self.on_done, None, None
         )
 
     def on_done(self, name):
         name = name.strip()
-        if not name:
+        if not name or name.endswith("/"):
             return
         if not name.endswith((".cpp", ".py")):
             name += ".cpp"
 
-        folder = _current_dir(self.window)
-        if not folder:
-            sublime.error_message("cp_tools: open the CP project folder first.")
-            return
+        root = _repo_root(self.window)
+        if "/" in name and root:
+            path = os.path.join(root, *[p for p in name.split("/") if p])
+        else:
+            folder = _current_dir(self.window)
+            if not folder:
+                sublime.error_message("cp_tools: open the CP project folder first.")
+                return
+            path = os.path.join(folder, name)
 
-        path = os.path.join(folder, name)
-        body = _template(self.window) if name.endswith(".cpp") else ""
+        folder = os.path.dirname(path)
+        body = _template(self.window) if path.endswith(".cpp") else ""
         created = _write_if_absent(path, body)
         _write_if_absent(os.path.join(folder, "input.txt"), "")
 
         self.window.open_file(path)
+        shown = os.path.relpath(path, root) if root else path
         sublime.status_message(
-            "cp: {} {}".format("created" if created else "opened", name)
+            "cp: {} {}".format("created" if created else "opened", shown)
         )
 
 
